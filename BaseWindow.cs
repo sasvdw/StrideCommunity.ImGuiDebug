@@ -16,6 +16,18 @@ public abstract class BaseWindow : GameSystem
     static Dictionary<string, uint> _windowId = new Dictionary<string, uint>();
 
     protected bool Open = true;
+    bool _closed;
+
+    /// <summary> False once the window has been closed (by the user's [x] or <see cref="Close"/>). </summary>
+    public bool IsOpen => !_closed;
+
+    /// <summary> Programmatically close the window, disposing it like the user clicking [x] would. </summary>
+    public void Close()
+    {
+        if (!_closed)
+            Dispose();
+    }
+
     protected uint Id;
     protected virtual ImGuiWindowFlags WindowFlags => ImGuiWindowFlags.None;
     protected virtual Vector2? WindowPos => null;
@@ -79,6 +91,7 @@ public abstract class BaseWindow : GameSystem
 
     protected override void Destroy()
     {
+        _closed = true;
         Game.GameSystems.Remove(this);
         OnDestroy();
         base.Destroy();

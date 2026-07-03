@@ -260,8 +260,11 @@ public class ImGuiSystem : GameSystemBase
                         _io.AddInputCharactersUTF8(tev.Text);
                         break;
                     case KeyEvent kev:
+                        // Use the event's own state, not the current key state: a press that goes
+                        // down-and-up within one frame (e.g. a fast Enter) would otherwise be seen as
+                        // "not down" and dropped, so InputText submits never fire.
                         if (_keys.TryGetValue(kev.Key, out var imGuiKey))
-                            _io.AddKeyEvent(imGuiKey, input.IsKeyDown(kev.Key));
+                            _io.AddKeyEvent(imGuiKey, kev.IsDown);
                         break;
                     case MouseWheelEvent mw:
                         _io.MouseWheel += mw.WheelDelta;
