@@ -6,6 +6,22 @@ using Stride.Core;
 namespace StrideCommunity.ImGuiDebug;
 
 /// <summary>
+/// Declares that this <see cref="BaseWindow"/> is owned and driven by another window
+/// (<see cref="Owner"/>) rather than opened on its own. <see cref="WindowRegistry.DiscoverWindows"/>
+/// skips owned windows, so they don't appear in <c>windows</c>/<c>open</c>/<c>close</c>/<c>toggle</c>;
+/// the owner constructs and manages them directly. E.g. <see cref="Inspector"/> is owned by
+/// <see cref="HierarchyView"/>, which sets its <c>Target</c> — an Inspector is useless until then.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
+public sealed class OwnedByAttribute : Attribute
+{
+    /// <summary> The window type that constructs and drives the annotated window. </summary>
+    public Type Owner { get; }
+
+    public OwnedByAttribute(Type owner) => Owner = owner ?? throw new ArgumentNullException(nameof(owner));
+}
+
+/// <summary>
 /// Tracks the set of debug windows that can be opened by name and the currently-live instances.
 /// Windows self-dispose when closed (see <see cref="BaseWindow"/>), so re-opening means re-running
 /// a factory; <see cref="Prune"/> reconciles instances the user closed via the window's [x].
@@ -49,6 +65,8 @@ public class WindowRegistry
             foreach (var t in types)
             {
                 if (t is null || t.IsAbstract || !typeof(BaseWindow).IsAssignableFrom(t))
+                    continue;
+                if (t.IsDefined(typeof(OwnedByAttribute), inherit: true))
                     continue;
                 if (_factories.ContainsKey(t.Name))
                     continue;

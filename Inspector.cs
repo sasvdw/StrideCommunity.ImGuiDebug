@@ -15,6 +15,11 @@ using static StrideCommunity.ImGuiDebug.ImGuiExtension;
 using StrideCommunity.ImGuiDebug;
 
 namespace StrideCommunity.ImGuiDebug;
+
+// Owned and driven by HierarchyView (Inspector.FindFreeInspector(...).Target = source), which
+// constructs it directly. The OwnedBy attribute keeps it out of the console's window list —
+// opening one standalone is pointless until its Target is set.
+[OwnedBy(typeof(HierarchyView))]
 public class Inspector : BaseWindow
 {
     /// <summary> Array of all possible <see cref="Filter"/> values </summary>
