@@ -198,7 +198,7 @@ public class ImGuiSystem : GameSystemBase
         };
 
         // finally set up the pipeline
-        var pipelineState = PipelineState.New(device, pipeline);
+        var pipelineState = PipelineState.New(device, ref pipeline);
         imPipeline = pipelineState;
 
         var is32Bits = false;
